@@ -1,2 +1,2 @@
 std_msgs/Header header 
-std_msgs/String id
+string id

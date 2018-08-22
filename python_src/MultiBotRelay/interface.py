@@ -8,6 +8,7 @@ from multi_robot_relay.msg import(
 import time
 import threading
 import std_msgs
+import alloy.ros
 
 
 class MultiBotInterface():
@@ -18,8 +19,8 @@ class MultiBotInterface():
         rospy.Subscriber('multibot_local/signal', MultiBotSignal, self._signal_callback, queue_size=5)
         rospy.Subscriber('multibot_local/talking', MultiBotTalking,self._talking_callback,queue_size=5)
 
-        self._signal_pub = rospy.Publisher('multibot_relay/signal', std_msgs.msg.String, queue_size=1)
-        self._talking_pub = rospy.Publisher('multibot_relay/talking', std_msgs.msg.String, queue_size=1)
+        self._signal_pub = rospy.Publisher('multibot_sender/signal', MultiBotSignal, queue_size=1)
+        self._talking_pub = rospy.Publisher('multibot_sender/talking', MultiBotTalking, queue_size=1)
 
         self._signal_event = threading.Event()
         self._signal_waiting_id = ""
@@ -43,13 +44,24 @@ class MultiBotInterface():
         pass
 
     def send_signal(self, signal):
-        msg = std_msgs.msg.String()
-        msg.data = signal
+        #create the message
+        msg = MultiBotSignal()
+        msg.header = alloy.ros.create_ros_header(rospy)
+        msg.signal = signal
+
         rospy.loginfo('publishing {}'.format(signal))
         #publish at a 10Hz for 1 second
         rate = rospy.Rate(10)
         for x in range(0,10):
             self._signal_pub.publish(msg)
+            rate.sleep()
+
+    def talking(self):
+        msg = MultiBotTalking()
+        #publish at a 10Hz for 1 second
+        rate = rospy.Rate(10)
+        for x in range(0,10):
+            self._talking_pub.publish(msg)
             rate.sleep()
 
     def wait_for_signal(self, signal, _id="", duration=None):
@@ -78,6 +90,7 @@ class MultiBotInterface():
 def main():
     rospy.init_node('test')
     face = MultiBotInterface()
+    face.talking()
     face.send_signal('HelloWorld')
     rospy.spin()
 
