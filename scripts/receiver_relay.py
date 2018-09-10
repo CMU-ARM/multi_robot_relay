@@ -14,10 +14,10 @@ import signal
 
 class ReceiverRelay():
 
-    def __init__(self, hostname, port):
+    def __init__(self):
         #hostname and IP
-        self._hostname = hostname
-        self._port = port
+        self._hostname = rospy.get_param('/hostname', 'localhost')
+        self._port = rospy.get_param('/port', 9090)
 
         self._python_ros = roslibpy.Ros(host=self._hostname, port=self._port)
         self._connected_robot_id = ""
@@ -67,7 +67,8 @@ class ReceiverRelay():
 
 def main():
     rospy.init_node('receiver_relay')
-    receiver = ReceiverRelay(hostname='localhost', port=9090)
+    receiver = ReceiverRelay()
+    #receiver = ReceiverRelay(hostname='localhost', port=9090)
     #receiver = ReceiverRelay(hostname='192.168.0.200', port=9090)
     #receiver.connect()
 

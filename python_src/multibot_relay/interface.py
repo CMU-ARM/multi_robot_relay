@@ -91,7 +91,7 @@ def main():
     rospy.init_node('test')
     face = MultiBotInterface()
     face.talking()
-    face.send_signal('HelloWorld')
+    face.send_signal('move')
     rospy.spin()
 
 if __name__ == '__main__':
