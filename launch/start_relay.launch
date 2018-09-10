@@ -1,0 +1,9 @@
+<launch>
+
+    <arg name="robot_id" default="podi"/>
+
+	<node pkg = "multi_robot_relay" type = "receiver_relay.py" name = "receiver" />
+	<node pkg = "multi_robot_relay" type = "sender_relay.py" name = "sender">
+		<param name="robot_id" value="$(arg robot_id)" type="string"/>
+	</node>
+</launch>
