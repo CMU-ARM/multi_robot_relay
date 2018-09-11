@@ -3,10 +3,11 @@
     <arg name="robot_id" default="podi"/>
     <arg name="hostname" default="192.168.0.152"/>
 
-	<node pkg = "multi_robot_relay" type = "receiver_relay.py" name ="receiver">
+	<node pkg = "multi_robot_relay" type = "receiver_relay.py" name ="receiver" output="screen">
 		<param name="hostname" value="$(arg hostname)" type="string"/>
 	</node>
 	<node pkg = "multi_robot_relay" type = "sender_relay.py" name = "sender" output="screen">
 		<param name="robot_id" value="$(arg robot_id)" type="string"/>
 	</node>
+	<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
 </launch>

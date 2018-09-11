@@ -36,13 +36,14 @@ class MultiBotInterface():
         self._last_signal = msg.signal
         if len(self._signal_waiting_list) > 0:
             for waiting_signal_info in list(self._signal_waiting_list):
+                print(waiting_signal_info)
                 if waiting_signal_info['id'] == "" or msg.id == waiting_signal_info['id']:
                     if waiting_signal_info['signal'] == msg.signal:
                         #this is the signal we are waiting for
                         waiting_signal_info['event'].set()
                         #remove the signal object
                         self._signal_waiting_list.remove(waiting_signal_info)
-                elif waiting_signal_info['signal'] == "" and waiting_signal_info['id'] == msg.id:
+                if waiting_signal_info['signal'] == "" and waiting_signal_info['id'] == msg.id:
                     #this is the signal we are waiting for
                     waiting_signal_info['event'].set()
                     #remove the signal object
@@ -84,7 +85,7 @@ class MultiBotInterface():
         self._signal_waiting_list.append(signal_event)
 
         #wait for the event
-        rospy.logdebug('waiting for signal from {}'.format(_id))
+        rospy.loginfo('waiting for signal from {}'.format(_id))
         called = event_obj.wait(duration)
         last_signal = copy.deepcopy(self._last_signal)
         if not called:

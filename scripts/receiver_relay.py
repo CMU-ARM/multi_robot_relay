@@ -31,6 +31,7 @@ class ReceiverRelay():
       
         self._multibot_signal_pub = rospy.Publisher('/multibot_local/signal', MultiBotSignal, queue_size=10)
         self._multibot_talking_pub = rospy.Publisher('/multibot_local/talking', MultiBotTalking, queue_size=1)
+        rospy.loginfo('receiver relay online')
 
     def connect(self):
         #listen for the topis that are multibot related
@@ -58,7 +59,7 @@ class ReceiverRelay():
 
 
     def _id_callback(self, msg):
-        print(msg)
+        #print(msg)
         self._connected_robot_id = msg.data
 
 
