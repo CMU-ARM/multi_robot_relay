@@ -9,6 +9,7 @@ import time
 import threading
 import std_msgs
 import alloy.ros
+import copy
 
 
 class MultiBotInterface():
@@ -26,11 +27,13 @@ class MultiBotInterface():
         self._signal_waiting_id = ""
         self._signal_data = ""
 
+        self._last_signal = ""
+
         self._signal_waiting_list = []
 
 
     def _signal_callback(self, msg):
-
+        self._last_signal = msg.signal
         if len(self._signal_waiting_list) > 0:
             for waiting_signal_info in list(self._signal_waiting_list):
                 if waiting_signal_info['id'] == "" or msg.id == waiting_signal_info['id']:
@@ -39,6 +42,12 @@ class MultiBotInterface():
                         waiting_signal_info['event'].set()
                         #remove the signal object
                         self._signal_waiting_list.remove(waiting_signal_info)
+                elif waiting_signal_info['signal'] == "" and waiting_signal_info['id'] == msg.id:
+                    #this is the signal we are waiting for
+                    waiting_signal_info['event'].set()
+                    #remove the signal object
+                    self._signal_waiting_list.remove(waiting_signal_info)                    
+
 
     def _talking_callback(self, msg):
         pass
@@ -63,6 +72,27 @@ class MultiBotInterface():
         for x in range(0,10):
             self._talking_pub.publish(msg)
             rate.sleep()
+
+    def wait_for_robot(self, _id, duration=None):
+        #create the object
+        event_obj = threading.Event()
+        signal_event = {
+            'id':_id,
+            'signal':"",
+            'event':event_obj
+        }
+        self._signal_waiting_list.append(signal_event)
+
+        #wait for the event
+        rospy.logdebug('waiting for signal from {}'.format(_id))
+        called = event_obj.wait(duration)
+        last_signal = copy.deepcopy(self._last_signal)
+        if not called:
+            #this means it timed out and we haven't got a callback yet
+            self._signal_waiting_list.remove(signal_event)
+            return None
+        else:
+            return last_signal       
 
     def wait_for_signal(self, signal, _id="", duration=None):
         """Wait for a signal from the given robot. Return true if signal is given
