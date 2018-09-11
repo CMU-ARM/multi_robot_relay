@@ -11,7 +11,7 @@ from multi_robot_relay.msg import(
 def main():
     rospy.init_node('sender_relay')
 
-    robot_id = rospy.get_param('/robot_id', 'DEFAULT_ROBOT_ID')
+    robot_id = rospy.get_param('sender/robot_id', 'DEFAULT_ROBOT_ID')
     robot_id_msgs = std_msgs.msg.String()
     robot_id_msgs.data = robot_id
 
