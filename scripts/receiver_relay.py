@@ -103,9 +103,9 @@ def main():
     rospy.init_node('receiver_relay')
     receiver = ReceiverRelay()
 
-    def ctrl_handler(sig, frame):
+    def shutdown_handler():
         receiver.stop()
-    signal.signal(signal.SIGINT, ctrl_handler)
+    rospy.on_shutdown(shutdown_handler)
 
     receiver.spin()
 
