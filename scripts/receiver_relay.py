@@ -24,32 +24,33 @@ class ReceiverRelay():
         self._connected_robot_id = ""
 
 
-        self._python_ros.on_ready(lambda: rospy.loginfo('Connected to external ROS on {}:{}'.format(self._hostname, self._port)))
-        self._python_ros.on_ready(self.connect,True)       
+        self._python_ros.factory.maxDelay = 5 #Attempt reconnect every 5 seconds after failed or lost connection
       
-        self._python_ros.on('close',self._reconnection_protocol)
-        self._restart_notification_flag = False
-        self._keep_alive = reconnect_on_fail
+        self._init_ready = False
+        self._python_ros.on('close', self._close_notification)
+        self._python_ros.on('ready', self._ready_notification)
 
         self._multibot_signal_pub = rospy.Publisher('/multibot_local/signal', MultiBotSignal, queue_size=10)
         self._multibot_talking_pub = rospy.Publisher('/multibot_local/talking', MultiBotTalking, queue_size=1)
         rospy.loginfo('initialization complete')
 
-    def _reconnection_protocol(self, msg):
+    def _close_notification(self, event):
         rospy.loginfo('Receiver lost connection to external ROS master at {}.'.format(self._hostname))
-        
-        #There's a bug where the library doesn't try to reconnect
-        #we just going to hack it by recreating another instance & replacing it
-        #I tried to figure out how to reconnect, but it's not working correctly
-        if self._keep_alive:
-            rospy.loginfo('Attempting reconnect to external ROS master at {}.'.format(self._hostname))
-            self._python_ros = roslibpy.Ros(host=self._hostname, port=self._port)
-            self._python_ros.on_ready(lambda: rospy.loginfo('Reconnected to external ROS on {}:{}'.format(self._hostname, self._port)))
-            self._python_ros.on_ready(self.connect,True)       
-            self._python_ros.on('close',self._reconnection_protocol)
 
+    def _ready_notification(self, event):
+        # Note: The reason we have our own flag to check whether its a reconnection is because 
+        # roslibpy's implementation closes the events, 'close' before setting their internal flags
+        # of disconenct to be false. Hence, if we have 'on_ready' in the close notification function
+        # it will immediately fire because the library still think it's connected
+        if not self._init_ready:
+            rospy.loginfo('Connected to external ROS on {}:{}'.format(self._hostname, self._port))
+            self._init_ready = True
+        else:
+            rospy.loginfo('Reconnected to external ROS on {}:{}'.format(self._hostname, self._port))
+        #reconnect with the topics we had
+        self._connect_to_topics()
 
-    def connect(self):
+    def _connect_to_topics(self):
         #listen for the topis that are multibot related
         self._id_topic = roslibpy.Topic(self._python_ros, name='/multibot_relay/robot_id', message_type="std_msgs/String",queue_size=10)
         self._id_topic.subscribe(self._id_callback)
