@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>multi_robot_relay</name>
-  <version>0.0.0</version>
-  <description>The multi_robot_relay package</description>
+  <name>tbd_multi_robot_relay</name>
+  <version>0.0.1</version>
+  <description>The tbd_multi_robot_relay package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="zhi@todo.todo">zhi</maintainer>
+  <maintainer email="zhi.tan@ri.cmu.edu">zhi</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>MIT</license>
 
 
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/multi_robot_relay</url> -->
+  <!-- <url type="website">http://wiki.ros.org/tbd_multi_robot_relay</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
